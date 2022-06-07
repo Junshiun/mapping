@@ -1,0 +1,39 @@
+.map-container {
+  width: 100%;
+  height: 200vh;
+  background-color: white;
+}
+
+.markWrap {
+  position: absolute;
+  display: flex;
+  align-items: center;
+}
+
+.markIcon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: orangered !important;
+}
+
+.markPlace {
+  width: 10rem;
+  height: 1rem;
+  padding: 0.5rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.oriMap {
+  width: 50rem;
+  height: 30rem;
+}
+
+.photoWrap {
+  width: 100%;
+  display: flex;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}

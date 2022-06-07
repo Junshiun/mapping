@@ -1,0 +1,14 @@
+.searchBox {
+  margin-top: 1rem;
+
+  form {
+    display: flex;
+  }
+
+  button[type="submit"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+}
