@@ -1,0 +1,12 @@
+.gm-svpc {
+  width: var(--icon-size-01) !important;
+  height: var(--icon-size-01) !important;
+  border-radius: 50% !important;
+  overflow: hidden;
+
+  img[aria-label="Street View Pegman Control"],
+  img[aria-label="Pegman is on top of the Map"] {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+}
