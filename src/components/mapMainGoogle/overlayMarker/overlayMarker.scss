@@ -1,0 +1,58 @@
+.overlay {
+  width: 10px;
+  height: 10px;
+  //   background-color: red;
+  border-radius: 50%;
+  border: 3px solid black;
+  cursor: pointer;
+
+  .infoBox {
+    z-index: 1;
+    width: fit-content;
+    min-width: 10rem;
+    max-width: 15rem;
+    background-color: white;
+    padding: 1rem;
+    position: absolute;
+    cursor: auto;
+    border-radius: 1rem;
+
+    .placeName {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+
+      & > h1 {
+        font-size: 1rem;
+        font-weight: 500;
+        width: max-content;
+      }
+
+      .icon {
+        margin-right: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & > img {
+          width: 0.5rem;
+          height: 0.5rem;
+          object-fit: cover;
+        }
+      }
+    }
+
+    .placeImageBox {
+      width: 100%;
+      height: 5rem;
+
+      & > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}

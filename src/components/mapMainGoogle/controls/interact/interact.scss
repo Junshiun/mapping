@@ -1,0 +1,26 @@
+.zoomBox {
+  margin-right: 0.9rem;
+
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: var(--icon-size-01);
+    width: var(--icon-size-01);
+    border-radius: 50%;
+    border: none;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+
+    div {
+      position: absolute;
+      right: 110%;
+      padding: 0.3rem;
+      background-color: black;
+      color: var(--grey-01);
+      width: max-content;
+      border-radius: 5px;
+      font-size: 10px;
+    }
+  }
+}

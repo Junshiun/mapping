@@ -7,14 +7,17 @@ import {
   OverlayView,
   InfoWindow,
 } from "@react-google-maps/api";
+import { OverlayMarker } from "./overlayMarker/overlayMarker";
 
 import { Provider, useDispatch, useSelector } from "react-redux";
-import store, { CHANGE_CENTER, MAP_REF } from "../../store";
-import { LocateUser } from "../../action/mapAction";
+import store, { MARKER_CENTER, MAP_REF } from "../../store";
+import { LocateUser, MarkerLocate } from "../../action/mapAction";
 
-import SearchBox from "./controls/searchBox";
-import Geolocate from "./controls/geoLocate";
+import SearchBox from "./controls/searchBox/searchBox";
+import CurrentMarker from "./controls/currentMarker/currentMarker";
+import { Interact } from "./controls/interact/interact";
 import "./mapMainGoogle.css";
+import "./googleDefault.scss";
 
 export default function MapMain() {
   const { isLoaded } = useLoadScript({
@@ -26,40 +29,46 @@ export default function MapMain() {
   return <Map />;
 }
 
+const initCenter = { center: { lat: 0, lng: 0 } };
+
 function Map() {
-  const [initialViewportState, setInitialViewportState] = useState({
-    center: { lat: 0, lng: 0 },
-  });
-  const [viewportState, setViewportState] = useState({
-    center: { lat: 0, lng: 0 },
-  });
+  const [zoom, setZoom] = useState(10);
+  const [bounds, setBounds] = useState(null);
+
+  const [userLocationState, setUserLocationState] = useState(initCenter);
+  const [locationState, setLocationState] = useState(initCenter);
+
   const [loadMap, setLoadMap] = useState(false);
   const [infoWindow, setInfoWindow] = useState(false);
 
-  const viewport = useSelector((state) => state.viewport);
+  const userLocation = useSelector((state) => state.userLocation);
+  const location = useSelector((state) => state.location);
+  const map = useSelector((state) => state.map);
   const dispatch = useDispatch();
 
+  const [searchMarker, setSearchMarker] = useState([]);
+
   useEffect(() => {
-    dispatch(LocateUser());
+    dispatch(LocateUser(null));
   }, []);
 
   useEffect(() => {
-    setInitialViewportState({
+    setUserLocationState({
       center: {
-        lat: viewport.lat,
-        lng: viewport.lng,
+        lat: userLocation.lat,
+        lng: userLocation.lng,
       },
     });
-  }, [viewport.initialize]);
+  }, [userLocation]);
 
   useEffect(() => {
-    setViewportState({
+    setLocationState({
       center: {
-        lat: viewport.lat,
-        lng: viewport.lng,
+        lat: location.lat,
+        lng: location.lng,
       },
     });
-  }, [viewport]);
+  }, [location]);
 
   const mapRef = useRef(null);
 
@@ -68,32 +77,46 @@ function Map() {
       setLoadMap(true);
     }, 1000);
 
+    setBounds(parentRef.current.getBoundingClientRect());
+
     mapRef.current = map;
 
     dispatch({ type: MAP_REF, payload: mapRef.current });
 
     const controlTopCenter = document.createElement("div");
+    const controlLeftCenter = document.createElement("div");
     const controlRightBottom = document.createElement("div");
 
     controlRightBottom.className = "controlRightCenter";
 
     const controlTopCenterRoot = createRoot(controlTopCenter);
-    const controlRightCenterRoot = createRoot(controlRightBottom);
+    const controlLeftCenterRoot = createRoot(controlLeftCenter);
+    const controlRightBottomRoot = createRoot(controlRightBottom);
 
     controlTopCenterRoot.render(
       <Provider store={store}>
-        <SearchBox />
+        <SearchBox setData={setSearchMarker} />
       </Provider>
     );
 
-    controlRightCenterRoot.render(
+    controlLeftCenterRoot.render(
       <Provider store={store}>
-        <Geolocate />
+        <CurrentMarker />
+      </Provider>
+    );
+
+    controlRightBottomRoot.render(
+      <Provider store={store}>
+        <Interact zoom={zoom} set={setZoom} />
       </Provider>
     );
 
     map.controls[window.google.maps.ControlPosition.TOP_CENTER].push(
       controlTopCenter
+    );
+
+    map.controls[window.google.maps.ControlPosition.LEFT_CENTER].push(
+      controlLeftCenter
     );
 
     map.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(
@@ -102,79 +125,114 @@ function Map() {
   };
 
   const defaultMapOptions = {
+    disableDoubleClickZoom: true,
     fullscreenControl: false,
     zoomControl: false,
+    mapTypeControl: false,
   };
 
-  const onLoad = () => {
-    console.log("here");
-  };
+  const parentRef = useRef(null);
+  const childRef = useRef(null);
 
   return (
-    <>
+    <div ref={parentRef} style={{ width: "100vw", height: "100vh" }}>
       <GoogleMap
-        center={initialViewportState.center}
-        zoom={10}
+        center={userLocationState.center}
+        zoom={zoom}
         mapContainerClassName="map-container"
-        onLoad={(map) => handleOnLoad(map)}
+        onLoad={(map) => {
+          handleOnLoad(map);
+        }}
         options={defaultMapOptions}
+        onDragEnd={() => {
+          setBounds(parentRef.current.getBoundingClientRect());
+        }}
       >
         {loadMap ? (
-          <Marker
-            animation={window.google.maps.Animation.BOUNCE}
-            draggable={true}
-            position={viewportState.center}
-            onClick={() => {
-              console.log("hey");
-            }}
-            icon={{
-              path: window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-              scale: 3,
-            }}
-            onMouseOver={() => {
-              setInfoWindow(true);
-            }}
-            onMouseOut={() => {
-              setInfoWindow(false);
-            }}
-            onDrag={() => {
-              setInfoWindow(false);
-            }}
-            onDragEnd={(e) => {
-              dispatch({
-                type: CHANGE_CENTER,
-                payload: { lat: e.latLng.lat(), lng: e.latLng.lng() },
-              });
-            }}
-          >
-            {infoWindow ? (
-              <OverlayView
-                position={viewportState.center}
-                mapPaneName={OverlayView.MARKER_LAYER}
-              >
-                <div>click to drag</div>
-              </OverlayView>
-            ) : null}
-          </Marker>
+          <>
+            <Marker
+              animation={window.google.maps.Animation.BOUNCE}
+              draggable={true}
+              position={locationState.center}
+              onClick={() => {
+                console.log("hey");
+              }}
+              icon={{
+                path: window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                scale: 3,
+              }}
+              onMouseOver={() => {
+                setInfoWindow(true);
+              }}
+              onMouseOut={() => {
+                setInfoWindow(false);
+              }}
+              onDrag={() => {
+                setInfoWindow(false);
+              }}
+              onDragEnd={(e) => {
+                dispatch(
+                  MarkerLocate(mapRef.current, {
+                    lat: e.latLng.lat(),
+                    lng: e.latLng.lng(),
+                  })
+                );
+              }}
+            >
+              {infoWindow ? (
+                <OverlayView
+                  position={locationState.center}
+                  mapPaneName={OverlayView.MARKER_LAYER}
+                  // bounds={bounds}
+                >
+                  <div>click to drag</div>
+                </OverlayView>
+              ) : null}
+            </Marker>
+            <Marker
+              draggable={false}
+              position={userLocationState.center}
+              icon={{
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 3,
+              }}
+            ></Marker>
+          </>
         ) : null}
-        {loadMap ? (
+        {/* {loadMap ? (
           <OverlayView
-            position={{ lat: 44, lng: 80 }}
+            position={locationState.center}
             mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            ref={testRef}
           >
             <div
+              className="iamhere"
+              ref={childRef}
               style={{
                 background: `white`,
                 border: `1px solid #ccc`,
                 padding: 15,
+                position: "absolute",
               }}
             >
               <h1>OverlayView</h1>
               <div>I have been clicked</div>
             </div>
           </OverlayView>
-        ) : null}
+        ) : null} */}
+        {searchMarker.length > 0
+          ? searchMarker.map((place, index) => {
+              return (
+                <OverlayMarker
+                  ref={mapRef}
+                  bounds={bounds}
+                  key={"place-" + index}
+                  place={place}
+                ></OverlayMarker>
+              );
+            })
+          : null}
       </GoogleMap>
-    </>
+    </div>
   );
 }

@@ -2,11 +2,15 @@ import { createStore, combineReducers, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
 
 export const MAP_REF = "map";
-export const CHANGE_CENTER = "change center";
+export const CHANGE_ZOOM = "change zoom";
+export const USER_LOCATION = "user location";
+export const MARKER_CENTER = "change center";
 export const TEST_CENTER = "test center";
 
 const initialState = {
-  viewport: { lat: 0, lng: 0, initialize: false },
+  // viewport: { zoom: 10 },
+  userLocation: { lat: 0, lng: 0, place_name: "", initialize: false },
+  location: { lat: 0, lng: 0, place_name: "", initialize: false },
 };
 
 const mapReducer = (state = {}, action) => {
@@ -18,10 +22,41 @@ const mapReducer = (state = {}, action) => {
   }
 };
 
-const viewportReducer = (state = {}, action) => {
+// const viewportReducer = (state = {}, action) => {
+//   switch (action.type) {
+//     case CHANGE_ZOOM:
+//       return { zoom: action.payload.zoom };
+//     default:
+//       return state;
+//   }
+// };
+
+const userLocationReducer = (state = {}, action) => {
   switch (action.type) {
-    case CHANGE_CENTER:
-      return { ...state, ...action.payload, initialize: true };
+    case USER_LOCATION:
+      return {
+        ...state,
+        lat: action.payload.lat,
+        lng: action.payload.lng,
+        place_name: action.payload.location,
+        initialize: true,
+      };
+    default:
+      return state;
+  }
+};
+
+const locationReducer = (state = {}, action) => {
+  switch (action.type) {
+    case MARKER_CENTER:
+      return {
+        ...state,
+        lat: action.payload.lat,
+        lng: action.payload.lng,
+        place_name: action.payload.place_name,
+        place_address: action.payload.place_address,
+        initialize: true,
+      };
     default:
       return state;
   }
@@ -39,7 +74,9 @@ const testReducer = (state = {}, action) => {
 
 const reducer = combineReducers({
   map: mapReducer,
-  viewport: viewportReducer,
+  // viewport: viewportReducer,
+  userLocation: userLocationReducer,
+  location: locationReducer,
   testState: testReducer,
 });
 

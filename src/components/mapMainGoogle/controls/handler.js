@@ -13,6 +13,8 @@ export const zoomHandler = (mapRef, targetZoom) => {
 };
 
 export const panHandler = (mapRef, { lat, lng }) => {
+  if (!mapRef) return;
+
   const center = { lat: lat, lng: lng };
 
   let timeoutArray = [];
@@ -20,7 +22,7 @@ export const panHandler = (mapRef, { lat, lng }) => {
   let done = false;
 
   const currentZoom = mapRef.getZoom();
-  const maxWait = 2000;
+  const maxWait = 1500;
 
   const latInterval = 100 / Math.pow(currentZoom, 3);
   const lngInterval = 200 / Math.pow(currentZoom, 3);
@@ -47,7 +49,7 @@ export const panHandler = (mapRef, { lat, lng }) => {
           lat: currentLat,
           lng: currentLng,
         });
-      }, 100 * i)
+      }, 80 * i)
     );
 
     currentLat =
