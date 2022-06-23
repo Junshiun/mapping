@@ -64,6 +64,44 @@ export const MarkerLocate = (map, center) => async (dispatch) => {
   panHandler(map, { lat: center.lat, lng: center.lng });
 };
 
+let directionsService;
+let directionsRenderer;
+
+export const DirectionRoutes = (map, origin, destination, type) => {
+  if (!directionsService) {
+    directionsService = new window.google.maps.DirectionsService();
+    directionsRenderer = new window.google.maps.DirectionsRenderer();
+  }
+
+  directionsService
+    .route({
+      origin: origin,
+      destination: destination,
+      travelMode: type,
+    })
+    .then((response) => {
+      console.log(response);
+      directionsRenderer.setMap(map);
+      directionsRenderer.setOptions({
+        // polylineOptions: {
+        //   strokeColor: "black",
+        // },
+        markerOptions: {
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 3,
+            strokeColor: "grey",
+            strokeOpacity: 0.1,
+            fillColor: "grey",
+            fillOpacity: 0.1,
+          },
+        },
+      });
+      directionsRenderer.setDirections(response);
+      directionsRenderer.setPanel(document.getElementById("sidebar"));
+    });
+};
+
 const ReverseGeocoder = async (center) => {
   const regex = /\s[^,]+/;
   const regex_results = /[^,]+/;

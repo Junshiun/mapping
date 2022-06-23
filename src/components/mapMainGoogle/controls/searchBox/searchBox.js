@@ -76,7 +76,6 @@ export default function SearchBox({ setData }) {
 
     function callback(results, status) {
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        console.log(results);
         setData(results);
       } else console.log("fail");
     }

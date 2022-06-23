@@ -1,5 +1,7 @@
 import { OverlayView } from "@react-google-maps/api";
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { DirectionRoutes } from "../../../action/mapAction";
 import "./overlayMarker.scss";
 
 export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
@@ -9,7 +11,11 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
   const childRef = useRef(null);
   const markRef = useRef(null);
 
+  const map = useSelector((state) => state.map);
+  const markerAt = useSelector((state) => state.location);
+
   useEffect(() => {
+    // console.log(place.geometry.location);
     if (place.hasOwnProperty("photos")) setPhoto(place.photos[0].getUrl());
     else setPhoto(null);
   });
@@ -19,6 +25,15 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
       setPosition(bounds, markRef, childRef);
     }
   }, [infoBox]);
+
+  const directionNavigate = () => {
+    DirectionRoutes(
+      map,
+      new window.google.maps.LatLng(markerAt.lat, markerAt.lng),
+      place.geometry.location,
+      "DRIVING"
+    );
+  };
 
   return (
     <OverlayView
@@ -73,6 +88,12 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
                 <img src={photo} alt={place.name}></img>
               </div>
             ) : null}
+            <button onClick={directionNavigate}>direction</button>
+            {/* <div className="adp-substep">
+              <div className="adp-stepicon">
+                <div className="adp-turn-right adp-maneuver"></div>
+              </div>
+            </div> */}
           </div>
         ) : (
           <div ref={childRef}></div>

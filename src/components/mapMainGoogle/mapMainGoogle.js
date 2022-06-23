@@ -134,8 +134,38 @@ function Map() {
   const parentRef = useRef(null);
   const childRef = useRef(null);
 
+  const directionFetch = () => {
+    const directionsService = new window.google.maps.DirectionsService();
+    const directionsRenderer = new window.google.maps.DirectionsRenderer();
+
+    directionsService
+      .route({
+        origin: "190 Main Street, Ottawa, Canada",
+        destination: "290 First Avenue, Ottawa, Canada",
+        travelMode: "DRIVING",
+      })
+      .then((response) => {
+        console.log(response);
+        directionsRenderer.setMap(mapRef.current);
+        directionsRenderer.setOptions({
+          markerOptions: {
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 3,
+              strokeColor: "grey",
+              strokeOpacity: 1,
+              fillColor: "grey",
+              fillOpacity: 1,
+            },
+          },
+        });
+        directionsRenderer.setDirections(response);
+      });
+  };
+
   return (
     <div ref={parentRef} style={{ width: "100vw", height: "100vh" }}>
+      {/* <button onClick={direction}>click me</button> */}
       <GoogleMap
         center={userLocationState.center}
         zoom={zoom}
