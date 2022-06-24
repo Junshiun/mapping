@@ -5,12 +5,14 @@ export const MAP_REF = "map";
 export const CHANGE_ZOOM = "change zoom";
 export const USER_LOCATION = "user location";
 export const MARKER_CENTER = "change center";
+export const ROUTES_RENDER = "render routes";
 export const TEST_CENTER = "test center";
 
 const initialState = {
   // viewport: { zoom: 10 },
   userLocation: { lat: 0, lng: 0, place_name: "", initialize: false },
   location: { lat: 0, lng: 0, place_name: "", initialize: false },
+  directionRoutes: { render: false },
 };
 
 const mapReducer = (state = {}, action) => {
@@ -62,6 +64,18 @@ const locationReducer = (state = {}, action) => {
   }
 };
 
+const routesReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ROUTES_RENDER:
+      return {
+        render: true,
+        routes: action.routes,
+      };
+    default:
+      return state;
+  }
+};
+
 const testReducer = (state = {}, action) => {
   switch (action.type) {
     case TEST_CENTER:
@@ -77,6 +91,7 @@ const reducer = combineReducers({
   // viewport: viewportReducer,
   userLocation: userLocationReducer,
   location: locationReducer,
+  directionRoutes: routesReducer,
   testState: testReducer,
 });
 

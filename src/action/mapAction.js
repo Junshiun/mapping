@@ -1,10 +1,11 @@
-import { MARKER_CENTER, USER_LOCATION } from "../store";
+import { MARKER_CENTER, USER_LOCATION, ROUTES_RENDER } from "../store";
 import { panHandler } from "../components/mapMainGoogle/controls/handler";
+import store from "../store";
 
 const GEOCODER_REVERSE =
   "https://maps.googleapis.com/maps/api/geocode/json?latlng=";
 
-export const LocateUser = (map) => (dispatch) => {
+export const LocateUser = () => (dispatch) => {
   let center = { lat: 0, lng: 0 };
   new Promise((resolve, reject) => {
     if (navigator.geolocation) {
@@ -49,11 +50,13 @@ export const LocateUser = (map) => (dispatch) => {
       payload: { lat: center.lat, lng: center.lng, ...res },
     });
 
-    panHandler(map, { lat: center.lat, lng: center.lng });
+    dispatch(originDestination(center));
+
+    panHandler({ lat: center.lat, lng: center.lng });
   });
 };
 
-export const MarkerLocate = (map, center) => async (dispatch) => {
+export const MarkerLocate = (center) => async (dispatch) => {
   const res = await ReverseGeocoder(center);
 
   await dispatch({
@@ -61,45 +64,62 @@ export const MarkerLocate = (map, center) => async (dispatch) => {
     payload: { lat: center.lat, lng: center.lng, ...res },
   });
 
-  panHandler(map, { lat: center.lat, lng: center.lng });
+  dispatch(originDestination(center));
+
+  panHandler({ lat: center.lat, lng: center.lng });
 };
 
 let directionsService;
 let directionsRenderer;
 
-export const DirectionRoutes = (map, origin, destination, type) => {
-  if (!directionsService) {
-    directionsService = new window.google.maps.DirectionsService();
-    directionsRenderer = new window.google.maps.DirectionsRenderer();
-  }
+export const DirectionRoutes =
+  (origin, destination, type) => async (dispatch) => {
+    const map = store.getState().map;
 
-  directionsService
-    .route({
-      origin: origin,
-      destination: destination,
-      travelMode: type,
-    })
-    .then((response) => {
-      console.log(response);
-      directionsRenderer.setMap(map);
-      directionsRenderer.setOptions({
-        // polylineOptions: {
-        //   strokeColor: "black",
-        // },
-        markerOptions: {
-          icon: {
-            path: window.google.maps.SymbolPath.CIRCLE,
-            scale: 3,
-            strokeColor: "grey",
-            strokeOpacity: 0.1,
-            fillColor: "grey",
-            fillOpacity: 0.1,
+    if (!directionsService) {
+      directionsService = new window.google.maps.DirectionsService();
+      directionsRenderer = new window.google.maps.DirectionsRenderer();
+    }
+
+    directionsService
+      .route({
+        origin: origin,
+        destination: destination,
+        travelMode: type,
+      })
+      .then((response) => {
+        // console.log(response);
+        directionsRenderer.setMap(map);
+        directionsRenderer.setOptions({
+          // polylineOptions: {
+          //   strokeColor: "black",
+          // },
+          markerOptions: {
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 3,
+              strokeColor: "grey",
+              strokeOpacity: 0.1,
+              fillColor: "grey",
+              fillOpacity: 0.1,
+            },
           },
-        },
+        });
+        directionsRenderer.setDirections(response);
+        // directionsRenderer.setPanel(document.getElementById("sidebar"));
+        dispatch({ type: ROUTES_RENDER, routes: response });
       });
-      directionsRenderer.setDirections(response);
-      directionsRenderer.setPanel(document.getElementById("sidebar"));
-    });
+  };
+
+const originDestination = (origin) => (dispatch) => {
+  if (store.getState().directionRoutes.render)
+    dispatch(
+      DirectionRoutes(
+        new window.google.maps.LatLng(origin.lat, origin.lng),
+        store.getState().directionRoutes.routes.request.destination.location,
+        "DRIVING"
+      )
+    );
 };
 
 const ReverseGeocoder = async (center) => {
