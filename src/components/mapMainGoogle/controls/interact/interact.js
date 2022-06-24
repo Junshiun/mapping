@@ -42,7 +42,7 @@ const ZoomBox = ({ zoom, set }) => {
 
     // mapRef.setCenter({ lat: center.lat, lng: center.lng });
 
-    panHandler(mapRef, { lat: center.lat, lng: center.lng });
+    panHandler({ lat: center.lat, lng: center.lng });
 
     const getZoom = mapRef.getZoom();
 

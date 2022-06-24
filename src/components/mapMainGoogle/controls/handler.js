@@ -1,4 +1,7 @@
-export const zoomHandler = (mapRef, targetZoom) => {
+import store from "../../../store";
+
+export const zoomHandler = (targetZoom) => {
+  const mapRef = store.getState().map;
   const currentZoom = mapRef.getZoom();
 
   const absDiff = Math.abs(targetZoom - currentZoom);
@@ -12,7 +15,9 @@ export const zoomHandler = (mapRef, targetZoom) => {
   }
 };
 
-export const panHandler = (mapRef, { lat, lng }) => {
+export const panHandler = ({ lat, lng }) => {
+  const mapRef = store.getState().map;
+
   if (!mapRef) return;
 
   const center = { lat: lat, lng: lng };

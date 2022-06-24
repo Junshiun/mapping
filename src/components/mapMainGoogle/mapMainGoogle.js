@@ -16,6 +16,7 @@ import { LocateUser, MarkerLocate } from "../../action/mapAction";
 import SearchBox from "./controls/searchBox/searchBox";
 import CurrentMarker from "./controls/currentMarker/currentMarker";
 import { Interact } from "./controls/interact/interact";
+import { Routes } from "./controls/directionsRoute/routes";
 import "./mapMainGoogle.css";
 import "./googleDefault.scss";
 
@@ -49,7 +50,7 @@ function Map() {
   const [searchMarker, setSearchMarker] = useState([]);
 
   useEffect(() => {
-    dispatch(LocateUser(null));
+    dispatch(LocateUser());
   }, []);
 
   useEffect(() => {
@@ -84,13 +85,13 @@ function Map() {
     dispatch({ type: MAP_REF, payload: mapRef.current });
 
     const controlTopCenter = document.createElement("div");
-    const controlLeftCenter = document.createElement("div");
+    const controlLeftTop = document.createElement("div");
     const controlRightBottom = document.createElement("div");
 
     controlRightBottom.className = "controlRightCenter";
 
     const controlTopCenterRoot = createRoot(controlTopCenter);
-    const controlLeftCenterRoot = createRoot(controlLeftCenter);
+    const controlLeftTopRoot = createRoot(controlLeftTop);
     const controlRightBottomRoot = createRoot(controlRightBottom);
 
     controlTopCenterRoot.render(
@@ -99,9 +100,10 @@ function Map() {
       </Provider>
     );
 
-    controlLeftCenterRoot.render(
+    controlLeftTopRoot.render(
       <Provider store={store}>
         <CurrentMarker />
+        <Routes />
       </Provider>
     );
 
@@ -115,8 +117,8 @@ function Map() {
       controlTopCenter
     );
 
-    map.controls[window.google.maps.ControlPosition.LEFT_CENTER].push(
-      controlLeftCenter
+    map.controls[window.google.maps.ControlPosition.LEFT_TOP].push(
+      controlLeftTop
     );
 
     map.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(
@@ -202,7 +204,7 @@ function Map() {
               }}
               onDragEnd={(e) => {
                 dispatch(
-                  MarkerLocate(mapRef.current, {
+                  MarkerLocate({
                     lat: e.latLng.lat(),
                     lng: e.latLng.lng(),
                   })

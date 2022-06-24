@@ -45,11 +45,11 @@ export default function SearchBox({ setData }) {
 
     if (searchBox.current.getPlaces().length > 1) {
       setData(searchBox.current.getPlaces());
-      panHandler(map, { lat: markerAt.lat, lng: markerAt.lng });
-      zoomHandler(map, 10);
+      panHandler({ lat: markerAt.lat, lng: markerAt.lng });
+      zoomHandler(10);
     } else {
       const place = searchBox.current.getPlaces()[0].geometry.location;
-      dispatch(MarkerLocate(map, { lat: place.lat(), lng: place.lng() }));
+      dispatch(MarkerLocate({ lat: place.lat(), lng: place.lng() }));
     }
   };
 
@@ -80,8 +80,8 @@ export default function SearchBox({ setData }) {
       } else console.log("fail");
     }
 
-    panHandler(map, { lat: markerAt.lat, lng: markerAt.lng });
-    zoomHandler(map, 10);
+    panHandler({ lat: markerAt.lat, lng: markerAt.lng });
+    zoomHandler(10);
   };
 
   return (

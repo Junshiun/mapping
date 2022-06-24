@@ -1,7 +1,8 @@
 import { OverlayView } from "@react-google-maps/api";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { DirectionRoutes } from "../../../action/mapAction";
+import { RiDirectionLine } from "react-icons/ri";
 import "./overlayMarker.scss";
 
 export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
@@ -11,8 +12,9 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
   const childRef = useRef(null);
   const markRef = useRef(null);
 
-  const map = useSelector((state) => state.map);
   const markerAt = useSelector((state) => state.location);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // console.log(place.geometry.location);
@@ -27,11 +29,12 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
   }, [infoBox]);
 
   const directionNavigate = () => {
-    DirectionRoutes(
-      map,
-      new window.google.maps.LatLng(markerAt.lat, markerAt.lng),
-      place.geometry.location,
-      "DRIVING"
+    dispatch(
+      DirectionRoutes(
+        new window.google.maps.LatLng(markerAt.lat, markerAt.lng),
+        place.geometry.location,
+        "DRIVING"
+      )
     );
   };
 
@@ -88,7 +91,12 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
                 <img src={photo} alt={place.name}></img>
               </div>
             ) : null}
-            <button onClick={directionNavigate}>direction</button>
+            <div className="navigate" onClick={directionNavigate}>
+              <span className="directionButton">
+                <RiDirectionLine></RiDirectionLine>
+              </span>
+              <span>directions</span>
+            </div>
             {/* <div className="adp-substep">
               <div className="adp-stepicon">
                 <div className="adp-turn-right adp-maneuver"></div>

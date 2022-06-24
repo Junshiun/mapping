@@ -19,7 +19,7 @@ const Geolocate = () => {
   return (
     <Button
       func={async () => {
-        dispatch(LocateUser(mapRef));
+        dispatch(LocateUser());
       }}
       icon={<IoMdLocate></IoMdLocate>}
       info="reset marker to your location"

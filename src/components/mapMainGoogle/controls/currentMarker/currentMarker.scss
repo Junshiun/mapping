@@ -1,8 +1,8 @@
 .currentMarkerInfo {
   position: relative;
-  margin-left: 1rem;
+  margin: 1rem 0 0 1rem;
   width: 13rem;
-  top: -5rem;
+  // top: 1rem;
   background-color: white;
   padding: 0.5rem;
   border-radius: 1rem;
@@ -22,6 +22,24 @@
 
     .icon {
       margin-right: 0.5rem;
+    }
+
+    .icon2 {
+      position: relative;
+      margin-left: 0.5rem;
+      cursor: pointer;
+
+      div {
+        position: absolute;
+        width: max-content;
+        left: 120%;
+        margin: auto;
+        background-color: black;
+        color: var(--grey-01);
+        padding: 0.3rem;
+        border-radius: 5px;
+        font-size: 10px;
+      }
     }
   }
 
