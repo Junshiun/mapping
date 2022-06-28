@@ -70,6 +70,7 @@ const routesReducer = (state = {}, action) => {
       return {
         render: true,
         routes: action.routes,
+        name: action.name,
       };
     default:
       return state;

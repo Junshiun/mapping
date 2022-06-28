@@ -32,7 +32,7 @@ export const OverlayMarker = forwardRef(({ place, bounds }, ref) => {
     dispatch(
       DirectionRoutes(
         new window.google.maps.LatLng(markerAt.lat, markerAt.lng),
-        place.geometry.location,
+        { desLocation: place.geometry.location, desName: place.name },
         "DRIVING"
       )
     );
@@ -125,7 +125,7 @@ const setPosition = (parentBounds, markRef, childRef) => {
 
   if (
     Math.abs(parentBounds.left - overlayBounds.left) <
-    childRef.current.offsetWidth - 15
+    childRef.current.offsetWidth + 1000
   ) {
     childRef.current.style.left = 0 + "px";
     childRef.current.style.right = "unset";

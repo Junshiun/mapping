@@ -73,7 +73,8 @@ let directionsService;
 let directionsRenderer;
 
 export const DirectionRoutes =
-  (origin, destination, type) => async (dispatch) => {
+  (origin, { desLocation, desName }, type) =>
+  async (dispatch) => {
     const map = store.getState().map;
 
     if (!directionsService) {
@@ -84,7 +85,7 @@ export const DirectionRoutes =
     directionsService
       .route({
         origin: origin,
-        destination: destination,
+        destination: desLocation,
         travelMode: type,
       })
       .then((response) => {
@@ -107,7 +108,11 @@ export const DirectionRoutes =
         });
         directionsRenderer.setDirections(response);
         // directionsRenderer.setPanel(document.getElementById("sidebar"));
-        dispatch({ type: ROUTES_RENDER, routes: response });
+        dispatch({
+          type: ROUTES_RENDER,
+          routes: response,
+          name: { des: desName },
+        });
       });
   };
 
@@ -116,7 +121,12 @@ const originDestination = (origin) => (dispatch) => {
     dispatch(
       DirectionRoutes(
         new window.google.maps.LatLng(origin.lat, origin.lng),
-        store.getState().directionRoutes.routes.request.destination.location,
+        {
+          desLocation:
+            store.getState().directionRoutes.routes.request.destination
+              .location,
+          desName: store.getState().directionRoutes.name.des,
+        },
         "DRIVING"
       )
     );
