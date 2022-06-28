@@ -110,8 +110,10 @@ export const DirectionRoutes =
         // directionsRenderer.setPanel(document.getElementById("sidebar"));
         dispatch({
           type: ROUTES_RENDER,
-          routes: response,
-          name: { des: desName },
+          routes: {
+            ...response,
+            originDestination: { des: { name: desName } },
+          },
         });
       });
   };

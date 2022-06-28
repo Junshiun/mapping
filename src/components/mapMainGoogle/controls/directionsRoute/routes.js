@@ -5,9 +5,7 @@ import "./directionDefaultIcon.scss";
 
 export const Routes = () => {
   const location = useSelector((state) => state.location);
-  const { render, routes, name } = useSelector(
-    (state) => state.directionRoutes
-  );
+  const { render, routes } = useSelector((state) => state.directionRoutes);
 
   const [renderer, setRenderer] = useState(render);
   const [navigate, setNavigate] = useState(routes);
@@ -52,7 +50,7 @@ export const Routes = () => {
       ) : (
         <>
           <div>From: {origin.place_address}</div>
-          <div>To: {name.des}</div>
+          <div>To: {routes.originDestination.des.name}</div>
         </>
       )}
     </div>
